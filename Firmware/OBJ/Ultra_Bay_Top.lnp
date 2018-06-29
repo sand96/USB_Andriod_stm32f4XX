@@ -1,7 +1,6 @@
 --cpu=Cortex-M4.fp
 "..\obj\main.o"
 "..\obj\stm32f4xx_it.o"
-"..\obj\motor_process.o"
 "..\obj\stm32f407vet_config.o"
 "..\obj\system_stm32f4xx.o"
 "..\obj\delay.o"
@@ -13,7 +12,6 @@
 "..\obj\stm32f4xx_tim.o"
 "..\obj\stm32f4xx_dma.o"
 "..\obj\stm32f4xx_usart.o"
-"..\obj\motor_init.o"
 "..\obj\usbd_core.o"
 "..\obj\usbd_ioreq.o"
 "..\obj\usbd_req.o"

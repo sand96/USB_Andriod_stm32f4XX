@@ -392,11 +392,6 @@
               <FilePath>.\stm32f4xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>Motor_Process.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Motor_Process.c</FilePath>
-            </File>
-            <File>
               <FileName>STM32F407VET_Config.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\STM32F407VET_Config.c</FilePath>
@@ -475,16 +470,6 @@
               <FileName>readme.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\readme.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>HARDWARE</GroupName>
-          <Files>
-            <File>
-              <FileName>Motor_Init.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\Motor_Init.c</FilePath>
             </File>
           </Files>
         </Group>

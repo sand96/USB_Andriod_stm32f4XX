@@ -1,15 +1,13 @@
 ..\obj\stm32f407vet_config.o: STM32F407VET_Config.c
 ..\obj\stm32f407vet_config.o: STM32F407VET_Config.h
 ..\obj\stm32f407vet_config.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-..\obj\stm32f407vet_config.o: ..\HARDWARE\Motor_Init.h
-..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_gpio.h
-..\obj\stm32f407vet_config.o: ..\USER\stm32f4xx.h
+..\obj\stm32f407vet_config.o: stm32f4xx.h
 ..\obj\stm32f407vet_config.o: ..\CORE\core_cm4.h
 ..\obj\stm32f407vet_config.o: ..\CORE\core_cmInstr.h
 ..\obj\stm32f407vet_config.o: ..\CORE\core_cmFunc.h
 ..\obj\stm32f407vet_config.o: ..\CORE\core_cm4_simd.h
-..\obj\stm32f407vet_config.o: ..\USER\system_stm32f4xx.h
-..\obj\stm32f407vet_config.o: ..\USER\stm32f4xx_conf.h
+..\obj\stm32f407vet_config.o: system_stm32f4xx.h
+..\obj\stm32f407vet_config.o: stm32f4xx_conf.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_adc.h
 ..\obj\stm32f407vet_config.o: ..\USER\stm32f4xx.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_crc.h
@@ -26,9 +24,9 @@
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_sdio.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_spi.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_syscfg.h
-..\obj\stm32f407vet_config.o: ..\USER\stm32f4xx_tim.h
+..\obj\stm32f407vet_config.o: stm32f4xx_tim.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_usart.h
-..\obj\stm32f407vet_config.o: ..\USER\stm32f4xx_wwdg.h
+..\obj\stm32f407vet_config.o: stm32f4xx_wwdg.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\misc.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_cryp.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_hash.h
@@ -37,4 +35,3 @@
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_dac.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_dcmi.h
 ..\obj\stm32f407vet_config.o: ..\FWLIB\inc\stm32f4xx_fsmc.h
-..\obj\stm32f407vet_config.o: Motor_Process.h

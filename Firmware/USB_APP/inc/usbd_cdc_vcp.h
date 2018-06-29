@@ -32,7 +32,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_core.h"
 #include "usbd_conf.h"
-
+/*Variable to transfer informatin---------------------------------------------*/
+extern u8 RX_Buffer[2048];
+extern u32 RX_Length;
+extern CDC_IF_Prop_TypeDef VCP_fops;
 
 /* Exported typef ------------------------------------------------------------*/
 /* The following structures groups all needed parameters to be configured for the 

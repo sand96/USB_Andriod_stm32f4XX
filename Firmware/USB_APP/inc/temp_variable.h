@@ -4,6 +4,6 @@
 
 #define EVAL_COM1                        USART2
 #define EVAL_COM1_IRQn                   USART2_IRQn
-#define COM1														 USART0
+//#define COM1														 USART0
 
 #endif

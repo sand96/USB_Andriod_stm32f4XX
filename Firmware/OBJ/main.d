@@ -52,3 +52,4 @@
 ..\obj\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\main.o: ..\USB_APP\inc\usbd_desc.h
 ..\obj\main.o: ..\USB\USB_Device\inc\usbd_req.h
+..\obj\main.o: ..\USB_APP\inc\usbd_cdc_vcp.h

@@ -34,6 +34,10 @@
 #include "stm32f4xx_usart.h"
 #include "temp_variable.h"
 
+/*Variable to transfer informatin---------------------------------------------*/
+u8 RX_Buffer[2048] = "";
+u32 RX_Length=0;
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -62,7 +66,7 @@ extern uint32_t APP_Rx_ptr_in;    /* Increment this pointer or roll it back to
 static uint16_t VCP_Init     (void);
 static uint16_t VCP_DeInit   (void);
 static uint16_t VCP_Ctrl     (uint32_t Cmd, uint8_t* Buf, uint32_t Len);
-static uint16_t VCP_DataTx   (void);
+static uint16_t VCP_DataTx   (uint8_t* Buf, uint32_t Len);
 static uint16_t VCP_DataRx   (uint8_t* Buf, uint32_t Len);
 
 static uint16_t VCP_COMConfig(uint8_t Conf);
@@ -85,7 +89,7 @@ CDC_IF_Prop_TypeDef VCP_fops =
   */
 static uint16_t VCP_Init(void)
 {
-  NVIC_InitTypeDef NVIC_InitStructure;
+ // NVIC_InitTypeDef NVIC_InitStructure;
   
   /* EVAL_COM1 default configuration */
   /* EVAL_COM1 configured as follow:
@@ -96,25 +100,25 @@ static uint16_t VCP_Init(void)
         - Hardware flow control disabled
         - Receive and transmit enabled
   */
-  USART_InitStructure.USART_BaudRate = 115200;
-  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-  USART_InitStructure.USART_StopBits = USART_StopBits_1;
-  USART_InitStructure.USART_Parity = USART_Parity_Odd;
-  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ // USART_InitStructure.USART_BaudRate = 115200;
+ // USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  //USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  //USART_InitStructure.USART_Parity = USART_Parity_Odd;
+ // USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  //USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 
   /* Configure and enable the USART */
-  USART_Init(USART3, &USART_InitStructure);
+ // USART_Init(COM1, &USART_InitStructure);
 
   /* Enable the USART Receive interrupt */
-  USART_ITConfig(EVAL_COM1, USART_IT_RXNE, ENABLE);
+  //USART_ITConfig(EVAL_COM1, USART_IT_RXNE, ENABLE);
 
   /* Enable USART Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = EVAL_COM1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+  //NVIC_InitStructure.NVIC_IRQChannel = EVAL_COM1_IRQn;
+ // NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  //NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+ // NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ // NVIC_Init(&NVIC_InitStructure);
   
   return USBD_OK;
 }
@@ -206,24 +210,34 @@ static uint16_t VCP_Ctrl (uint32_t Cmd, uint8_t* Buf, uint32_t Len)
   * @param  Len: Number of data to be sent (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else VCP_FAIL
   */
-static uint16_t VCP_DataTx (void)
+static uint16_t VCP_DataTx (uint8_t* Buf, uint32_t Len)
 {
-  if (linecoding.datatype == 7)
-  {
-    APP_Rx_Buffer[APP_Rx_ptr_in] = USART_ReceiveData(EVAL_COM1) & 0x7F;
-  }
-  else if (linecoding.datatype == 8)
-  {
-    APP_Rx_Buffer[APP_Rx_ptr_in] = USART_ReceiveData(EVAL_COM1);
-  }
+	if(linecoding.datatype ==8)
+	{
+		for(u8 i =0; i <Len; i++)
+		 APP_Rx_Buffer[APP_Rx_ptr_in++] = Buf[i];
+		 /*To aviod Buffer overflow*/
+		if(APP_Rx_ptr_in == APP_RX_DATA_SIZE)
+		{
+			APP_Rx_ptr_in = 0;
+		}
+	}
+//  if (linecoding.datatype == 7)
+//  {
+//    APP_Rx_Buffer[APP_Rx_ptr_in] = USART_ReceiveData(EVAL_COM1) & 0x7F;
+//  }
+//  else if (linecoding.datatype == 8)
+//  {
+//    APP_Rx_Buffer[APP_Rx_ptr_in] = USART_ReceiveData(EVAL_COM1);
+//  }
   
-  APP_Rx_ptr_in++;
+//  APP_Rx_ptr_in++;
   
-  /* To avoid buffer overflow */
-  if(APP_Rx_ptr_in == APP_RX_DATA_SIZE)
-  {
-    APP_Rx_ptr_in = 0;
-  }  
+//  /* To avoid buffer overflow */
+//  if(APP_Rx_ptr_in == APP_RX_DATA_SIZE)
+//  {
+//   APP_Rx_ptr_in = 0;
+//  }  
   
   return USBD_OK;
 }
@@ -245,13 +259,18 @@ static uint16_t VCP_DataTx (void)
   */
 static uint16_t VCP_DataRx (uint8_t* Buf, uint32_t Len)
 {
-  uint32_t i;
+	RX_Length = Len;
+	for(u32 i = 0; i <Len; i++)
+	{
+		RX_Buffer[i] = Buf[i];
+	}
+//  uint32_t i;
   
-  for (i = 0; i < Len; i++)
-  {
-    USART_SendData(EVAL_COM1, *(Buf + i) );
-    while(USART_GetFlagStatus(EVAL_COM1, USART_FLAG_TXE) == RESET); 
-  } 
+//  for (i = 0; i < Len; i++)
+//  {
+//    USART_SendData(EVAL_COM1, *(Buf + i) );
+//    while(USART_GetFlagStatus(EVAL_COM1, USART_FLAG_TXE) == RESET); 
+//  } 
  
   return USBD_OK;
 }
@@ -364,19 +383,19 @@ static uint16_t VCP_COMConfig(uint8_t Conf)
   * @param  None.
   * @retval None.
   */
-void EVAL_COM_IRQHandler(void)
-{
-  if (USART_GetITStatus(EVAL_COM1, USART_IT_RXNE) != RESET)
-  {
-    /* Send the received data to the PC Host*/
-    VCP_DataTx ();
-  }
+//void EVAL_COM_IRQHandler(void)
+//{
+//  if (USART_GetITStatus(EVAL_COM1, USART_IT_RXNE) != RESET)
+//  {
+//    /* Send the received data to the PC Host*/
+//    VCP_DataTx ();
+//  }
 
   /* If overrun condition occurs, clear the ORE flag and recover communication */
-  if (USART_GetFlagStatus(EVAL_COM1, USART_FLAG_ORE) != RESET)
-  {
-    (void)USART_ReceiveData(EVAL_COM1);
-  }
-}
+//  if (USART_GetFlagStatus(EVAL_COM1, USART_FLAG_ORE) != RESET)
+//  {
+//    (void)USART_ReceiveData(EVAL_COM1);
+//  }
+//}
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

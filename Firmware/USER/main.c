@@ -11,6 +11,7 @@
 #include "usbd_usr.h"
 #include "usb_conf.h"
 #include "usbd_desc.h"
+#include "usbd_cdc_vcp.h"
 
 #ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
   #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -20,6 +21,10 @@
    
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END ;
 
+/*Variable to transfer informatin---------------------------------------------*/
+extern u8 RX_Buffer[2048];
+extern u32 RX_Length;
+extern CDC_IF_Prop_TypeDef VCP_fops;
 /**
   * @}
   */ 
@@ -44,7 +49,6 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END ;
   */
 int main(void)
 {
-	unsigned long int a;
   __IO uint32_t i = 0;  
 
   /*!< At this stage the microcontroller clock setting is already configured, 
@@ -69,8 +73,12 @@ int main(void)
   {
     if (i++ == 0x100000)
     {
-			a++;
+			if(RX_Length !=0 )
+			{
+				VCP_fops.pIf_DataTx(RX_Buffer, RX_Length);
+				RX_Length = 0;
       i = 0;
-    }
-  }
+			}
+		}
+	}
 } 

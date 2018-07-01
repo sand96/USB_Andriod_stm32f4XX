@@ -117,7 +117,7 @@
 #endif /* USE_EMBEDDED_PHY */
 
 #ifdef USE_USB_OTG_HS 
- #define USB_OTG_HS_CORE
+/* #define USB_OTG_HS_CORE */
 #endif
 
 /*******************************************************************************

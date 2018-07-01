@@ -27,6 +27,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_usr.h"
+#include "stm32f4xx_conf.h"
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
 * @{

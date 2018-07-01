@@ -30,6 +30,7 @@
 #include "usb_bsp.h"
 #include "stm32f4xx.h"  
 #include "misc.h"
+#include "stm32f4xx_conf.h"
 
 /** @addtogroup USB_OTG_DRIVER
 * @{

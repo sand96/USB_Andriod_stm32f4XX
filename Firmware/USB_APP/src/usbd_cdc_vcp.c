@@ -31,8 +31,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_vcp.h"
-#include "stm32f4xx_usart.h"
 #include "temp_variable.h"
+#include "stm32f4xx_conf.h"
 
 /*Variable to transfer informatin---------------------------------------------*/
 u8 RX_Buffer[2048] = "";

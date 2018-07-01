@@ -66,7 +66,7 @@ int main(void)
 #endif  
             &USR_desc, 
             &USBD_CDC_cb, 
-            &USR_cb);
+            &USR_cb); //not useful, just for led. 
   
   /* Main loop */
   while (1)

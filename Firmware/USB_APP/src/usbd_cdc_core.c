@@ -193,6 +193,9 @@ uint8_t  USB_Tx_State = USB_CDC_IDLE;
 static uint32_t cdcCmd = 0xFF;
 static uint32_t cdcLen = 0;
 
+static u8 TxBufTemp[64] = "";
+static u8 flag = 0;
+
 /* CDC interface class callbacks structure */
 USBD_Class_cb_TypeDef  USBD_CDC_cb = 
 {
@@ -612,9 +615,12 @@ uint8_t  usbd_cdc_EP0_RxReady (void  *pdev)
   */
 uint8_t  usbd_cdc_DataIn (void *pdev, uint8_t epnum)
 {
-  uint16_t USB_Tx_ptr;
+ // uint16_t USB_Tx_ptr;
   uint16_t USB_Tx_length;
   
+  u32 Len;
+  u32 i;
+
   if (USB_Tx_State == USB_CDC_BUSY)
   {
     if (APP_Rx_length == 0) 
@@ -623,30 +629,97 @@ uint8_t  usbd_cdc_DataIn (void *pdev, uint8_t epnum)
     }
     else 
     {
-      if (APP_Rx_length > CDC_DATA_IN_PACKET_SIZE){
-        USB_Tx_ptr = APP_Rx_ptr_out;
-        USB_Tx_length = CDC_DATA_IN_PACKET_SIZE;
-        
-        APP_Rx_ptr_out += CDC_DATA_IN_PACKET_SIZE;
-        APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;    
-      }
-      else 
+      if(APP_Rx_ptr_out > APP_Rx_ptr_in) /* first sitution */
       {
-        USB_Tx_ptr = APP_Rx_ptr_out;
-        USB_Tx_length = APP_Rx_length;
-        
-        APP_Rx_ptr_out += APP_Rx_length;
-        APP_Rx_length = 0;
-        if(USB_Tx_length == CDC_DATA_IN_PACKET_SIZE)
+        APP_Rx_length = APP_RX_DATA_SIZE - APP_Rx_ptr_out;
+        APP_Rx_length += APP_Rx_ptr_in;
+        flag = 1; //show rollback happens
+      }
+      else /* No rollback happens*/
+      {
+        APP_Rx_length = APP_Rx_ptr_in - APP_Rx_ptr_out;
+      }
+
+        /*enough data to transfer*/
+        /*Put all the data into a new array called TxBufTemp*/
+      if(APP_Rx_length > CDC_DATA_IN_PACKET_SIZE)
+      {
+        if(flag == 1)
         {
-          USB_Tx_State = USB_CDC_ZLP;
+          Len = APP_Rx_ptr_out + CDC_DATA_IN_PACKET_SIZE;
+           /*if the Len is bigger than the app buffer*/
+          if(Len > APP_RX_DATA_SIZE) // APP_RX_DATA_SIZE is 2048B
+          {
+            /*first part data*/
+            for( i = 0; i < (APP_RX_DATA_SIZE - APP_Rx_ptr_out); i++)
+              TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+            /*second part data*/
+            for(i = 0 ; i <(Len - APP_RX_DATA_SIZE); i++ )
+              TxBufTemp[APP_RX_DATA_SIZE - APP_Rx_ptr_out + i] = APP_Rx_Buffer[i];
+            USB_Tx_length = CDC_DATA_IN_PACKET_SIZE;
+            APP_Rx_ptr_out = CDC_DATA_IN_PACKET_SIZE + APP_Rx_ptr_out -APP_RX_DATA_SIZE;
+            APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;
+          }
+          else /* Len < APP_RX_DATA_SIZE*/
+          {
+            for(i = 0; i < CDC_DATA_IN_PACKET_SIZE; i++)
+              TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+            USB_Tx_length = CDC_DATA_IN_PACKET_SIZE;
+            APP_Rx_ptr_out += CDC_DATA_IN_PACKET_SIZE;
+            APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;
+          }
+        }
+        else /*flag == 0*/
+        {
+          for(i = 0; i < CDC_DATA_IN_PACKET_SIZE; i++)
+          TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+          USB_Tx_length = CDC_DATA_IN_PACKET_SIZE;
+          APP_Rx_ptr_out += CDC_DATA_IN_PACKET_SIZE;
+          APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;
+        }
+      }
+
+      else /*APP_Rx_length < CDC_DATA_IN_PACKET_SIZE*/
+      {
+        if(flag == 1)
+        {
+          Len = APP_Rx_ptr_out + APP_Rx_length;
+           /*if the Len is bigger than the app buffer*/
+          if(Len > APP_RX_DATA_SIZE) // APP_RX_DATA_SIZE is 2048B
+          {
+            /*first part data*/
+            for( i = 0; i < (APP_RX_DATA_SIZE - APP_Rx_ptr_out); i++)
+              TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+            /*second part data*/
+            for(i = 0 ; i <(APP_Rx_length + APP_Rx_ptr_out- APP_RX_DATA_SIZE); i++ )
+              TxBufTemp[APP_RX_DATA_SIZE - APP_Rx_ptr_out + i] = APP_Rx_Buffer[i];
+            USB_Tx_length = APP_Rx_length;
+            APP_Rx_ptr_out = APP_Rx_length + APP_Rx_ptr_out -APP_RX_DATA_SIZE;
+            APP_Rx_length = 0;
+          }
+          else /* Len < APP_RX_DATA_SIZE*/
+          {
+            for(i = 0; i < APP_Rx_length; i++)
+            TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+            USB_Tx_length = APP_Rx_length;
+            APP_Rx_ptr_out += APP_Rx_length;
+            APP_Rx_length = 0;
+          }
+        }
+        else /*flag == 0*/
+        {
+          for(i = 0; i < APP_Rx_length; i++)
+          TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+          USB_Tx_length = APP_Rx_length;
+          APP_Rx_ptr_out += APP_Rx_length;
+          APP_Rx_length = 0;
         }
       }
       
       /* Prepare the available data buffer to be sent on IN endpoint */
       DCD_EP_Tx (pdev,
                  CDC_IN_EP,
-                 (uint8_t*)&APP_Rx_Buffer[USB_Tx_ptr],
+                 TxBufTemp,
                  USB_Tx_length);
       return USBD_OK;
     }
@@ -724,10 +797,12 @@ uint8_t  usbd_cdc_SOF (void *pdev)
   */
 static void Handle_USBAsynchXfer (void *pdev)
 {
-  uint16_t USB_Tx_ptr;
+  //uint16_t USB_Tx_ptr;
   uint16_t USB_Tx_length;
-  
-  if(USB_Tx_State == USB_CDC_IDLE)
+  u32 i;
+  u32 Len;
+
+  if(USB_Tx_State != USB_CDC_BUSY)
   {
     if (APP_Rx_ptr_out == APP_RX_DATA_SIZE)
     {
@@ -743,46 +818,91 @@ static void Handle_USBAsynchXfer (void *pdev)
     if(APP_Rx_ptr_out > APP_Rx_ptr_in) /* rollback */
     { 
       APP_Rx_length = APP_RX_DATA_SIZE - APP_Rx_ptr_out;
+      APP_Rx_length += APP_Rx_ptr_in;
+      flag = 1;
       
     }
     else 
     {
       APP_Rx_length = APP_Rx_ptr_in - APP_Rx_ptr_out;
-      
+      flag = 0; 
     }
+    
 #ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
     APP_Rx_length &= ~0x03;
 #endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
     
     if (APP_Rx_length > CDC_DATA_IN_PACKET_SIZE)
     {
-      USB_Tx_ptr = APP_Rx_ptr_out;
-      USB_Tx_length = CDC_DATA_IN_PACKET_SIZE;
-      
-      APP_Rx_ptr_out += CDC_DATA_IN_PACKET_SIZE;	
-      APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;
-      USB_Tx_State = USB_CDC_BUSY;
+			if(flag)
+			{
+				Len = APP_Rx_ptr_out + CDC_DATA_IN_PACKET_SIZE;
+				if(Len > APP_RX_DATA_SIZE)
+				{
+					for(i = 0; i < (APP_RX_DATA_SIZE -APP_Rx_ptr_out); i++)
+					TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+					for(i = 0; i < CDC_DATA_IN_PACKET_SIZE + APP_Rx_ptr_out - APP_RX_DATA_SIZE; i++)
+					TxBufTemp[APP_RX_DATA_SIZE- APP_Rx_ptr_out + i] = APP_Rx_Buffer[i];
+			      USB_Tx_length = CDC_DATA_IN_PACKET_SIZE; 
+			      APP_Rx_ptr_out = CDC_DATA_IN_PACKET_SIZE + APP_Rx_ptr_out - APP_RX_DATA_SIZE;	
+			      APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;
+				}
+				else
+				{
+					for(i = 0; i < CDC_DATA_IN_PACKET_SIZE; i++)
+					TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out];
+					USB_Tx_length = CDC_DATA_IN_PACKET_SIZE;
+				    APP_Rx_ptr_out += CDC_DATA_IN_PACKET_SIZE;	
+				    APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;
+				}
+			}
+			else
+			{
+				for(i = 0; i < CDC_DATA_IN_PACKET_SIZE; i++)
+				TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out];
+				USB_Tx_length = CDC_DATA_IN_PACKET_SIZE;
+			    APP_Rx_ptr_out += CDC_DATA_IN_PACKET_SIZE;	
+			    APP_Rx_length -= CDC_DATA_IN_PACKET_SIZE;
+
+			}
     }
     else
     {
-      USB_Tx_ptr = APP_Rx_ptr_out;
-      USB_Tx_length = APP_Rx_length;
-      
-      APP_Rx_ptr_out += APP_Rx_length;
-      APP_Rx_length = 0;
-      if(USB_Tx_length == CDC_DATA_IN_PACKET_SIZE)
-      {
-        USB_Tx_State = USB_CDC_ZLP;
-      }
-      else
-      {
-        USB_Tx_State = USB_CDC_BUSY;
-      }
+    	if(flag)
+    	{
+    		Len = APP_Rx_ptr_out + APP_Rx_length;
+    		if(Len > APP_RX_DATA_SIZE)
+    		{
+	    		for(i = 0; i < APP_RX_DATA_SIZE - APP_Rx_ptr_out ; i++)
+	    			TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+	    		for(i = 0; i < APP_Rx_length + APP_Rx_ptr_out - APP_RX_DATA_SIZE; i++)
+	    			TxBufTemp[i + APP_RX_DATA_SIZE - APP_Rx_ptr_out + i] = APP_Rx_Buffer[i];
+	    		USB_Tx_length = APP_Rx_length;
+	    		APP_Rx_ptr_out = APP_Rx_length + APP_Rx_ptr_out - APP_RX_DATA_SIZE;
+	    		APP_Rx_length = 0;
+    		}
+    		else
+    		{
+    			for(i = 0; i < APP_Rx_length ; i ++)
+    				TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+ 	    		USB_Tx_length = APP_Rx_length;
+	    		APP_Rx_ptr_out += APP_Rx_length;
+	    		APP_Rx_length = 0;   			
+    		}
+    	}
+    	else
+    	{
+			for(i = 0; i < APP_Rx_length ; i ++)
+				TxBufTemp[i] = APP_Rx_Buffer[APP_Rx_ptr_out + i];
+	    		USB_Tx_length = APP_Rx_length;
+    		APP_Rx_ptr_out += APP_Rx_length;
+    		APP_Rx_length = 0;     		
+    	}
     }
     
     DCD_EP_Tx (pdev,
                CDC_IN_EP,
-               (uint8_t*)&APP_Rx_Buffer[USB_Tx_ptr],
+               TxBufTemp,
                USB_Tx_length);
   }  
 }

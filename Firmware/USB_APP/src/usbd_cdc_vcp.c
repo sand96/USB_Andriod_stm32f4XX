@@ -140,7 +140,7 @@ static uint16_t VCP_DeInit(void)
   * @brief  VCP_Ctrl
   *         Manage the CDC class requests
   * @param  Cmd: Command code            
-  * @param  Buf: Buffer containing command data (request parameters)
+  * @param  Buf: Buffer containing command data (rfequest parameters)
   * @param  Len: Number of data to be sent (in bytes)
   * @retval Result of the operation (USBD_OK in all cases)
   */

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [..\OBJ\Ultra_Bay_Top.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image ..\OBJ\Ultra_Bay_Top.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sun Jul 01 10:21:31 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sun Jul 01 17:01:26 2018
 <BR><P>
 <H3>Maximum Stack Usage =        160 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1231,7 +1231,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[11]"></a>usbd_cdc_DataIn</STRONG> (Thumb, 160 bytes, Stack size 24 bytes, usbd_cdc_core.o(i.usbd_cdc_DataIn))
+<P><STRONG><a name="[11]"></a>usbd_cdc_DataIn</STRONG> (Thumb, 594 bytes, Stack size 24 bytes, usbd_cdc_core.o(i.usbd_cdc_DataIn))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = usbd_cdc_DataIn &rArr; DCD_EP_Tx &rArr; USB_OTG_EPStartXfer &rArr; USB_OTG_WritePacket
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DCD_EP_Tx
@@ -1266,7 +1266,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> usbd_cdc_core.o(.data)
 </UL>
 <P><STRONG><a name="[13]"></a>usbd_cdc_SOF</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, usbd_cdc_core.o(i.usbd_cdc_SOF))
-<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = usbd_cdc_SOF &rArr; Handle_USBAsynchXfer &rArr; DCD_EP_Tx &rArr; USB_OTG_EPStartXfer &rArr; USB_OTG_WritePacket
+<BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = usbd_cdc_SOF &rArr; Handle_USBAsynchXfer &rArr; DCD_EP_Tx &rArr; USB_OTG_EPStartXfer &rArr; USB_OTG_WritePacket
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Handle_USBAsynchXfer
 </UL>
@@ -1560,8 +1560,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DCD_HandleInEP_ISR
 </UL>
 
-<P><STRONG><a name="[c0]"></a>Handle_USBAsynchXfer</STRONG> (Thumb, 200 bytes, Stack size 16 bytes, usbd_cdc_core.o(i.Handle_USBAsynchXfer))
-<BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = Handle_USBAsynchXfer &rArr; DCD_EP_Tx &rArr; USB_OTG_EPStartXfer &rArr; USB_OTG_WritePacket
+<P><STRONG><a name="[c0]"></a>Handle_USBAsynchXfer</STRONG> (Thumb, 594 bytes, Stack size 24 bytes, usbd_cdc_core.o(i.Handle_USBAsynchXfer))
+<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = Handle_USBAsynchXfer &rArr; DCD_EP_Tx &rArr; USB_OTG_EPStartXfer &rArr; USB_OTG_WritePacket
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DCD_EP_Tx
 </UL>

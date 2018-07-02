@@ -77,8 +77,8 @@ int main(void)
 			{
 				VCP_fops.pIf_DataTx(RX_Buffer, RX_Length);
 				RX_Length = 0;
-      i = 0;
 			}
+      i = 0;
 		}
 	}
 } 

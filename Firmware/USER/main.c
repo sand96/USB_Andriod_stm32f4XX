@@ -25,6 +25,10 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END ;
 extern u8 RX_Buffer[2048];
 extern u32 RX_Length;
 extern CDC_IF_Prop_TypeDef VCP_fops;
+
+//extern u8 Test_Buffer[2048];
+//extern u32 Test_Length;
+
 /**
   * @}
   */ 
@@ -49,6 +53,9 @@ extern CDC_IF_Prop_TypeDef VCP_fops;
   */
 int main(void)
 {
+uint8_t* Test_Buffer;
+u32 Test_Length = 8;
+	Test_Buffer = "abc34567";
   __IO uint32_t i = 0;  
 
   /*!< At this stage the microcontroller clock setting is already configured, 
@@ -73,11 +80,12 @@ int main(void)
   {
     if (i++ == 0x100000)
     {
-			if(RX_Length !=0 )
+		/*	if(RX_Length !=0 )
 			{
 				VCP_fops.pIf_DataTx(RX_Buffer, RX_Length);
 				RX_Length = 0;
-			}
+			} */
+			VCP_fops.pIf_DataTx(Test_Buffer, Test_Length);
       i = 0;
 		}
 	}
